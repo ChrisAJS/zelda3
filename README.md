@@ -1,3 +1,5 @@
+This is a fork of [the Zelda 3 reimplementation project](https://github.com/snesrev/zelda3).
+
 # Zelda3
 A reimplementation of Zelda 3.
 
@@ -40,36 +42,15 @@ Higher quality map screen.
   - `python -m pip install -r requirements.txt`
 
 ## Compiling
+Compilation instructions are generated via CMake.
 
-Look at the wiki at https://github.com/snesrev/zelda3/wiki for more help.
-
-### Windows
-First extract and compile resources.
-
-`cd tables`
-
-Run `python3 extract_resources.py` to extract resources from the ROM into a more human readable format.
-
-Run `python3 compile_resources.py` to produce .h files that get included by the C code.
-
-Then build the .sln file with Visual Studio.
-
-### Linux/macOS
+### Windows/Linux/macOS
 
 ```sh
-make
+mkdir build && cd build
+cmake ..
+make -j$(nproc)
 ```
-<details>
-<summary>
-Advanced make usage ...
-</summary>
-
-```sh
-make -j$(nproc) # run on all core
-make clean all  # clear gen+obj and rebuild
-CC=clang make   # specify compiler
-```
-</details>
 
 ## Usage and controls
 

@@ -4,6 +4,8 @@ import yaml
 import re
 import util
 
+EXTRACT_PATH='extracted/'
+
 class Song:
   name = 'Song'
   def __str__(self):
@@ -333,7 +335,7 @@ def serialize_song(serializer, song, sorted_ents):
  #   serializer.write_zeros(0x2850, 0x2880)
     serializer.addr = 0x4000
     sample_to_addr = {}
-    music_info = yaml.safe_load(open('music_info.yaml', 'r'))
+    music_info = yaml.safe_load(open(EXTRACT_PATH+'music_info.yaml', 'r'))
     for i, info in enumerate(music_info['samples']):
       if info['file'] not in sample_to_addr:
         sample_to_addr[info['file']] = serializer.addr
@@ -343,7 +345,7 @@ def serialize_song(serializer, song, sorted_ents):
       serializer.write_word(0x3c00 + i * 4 + 2, addr + info['repeat'] // 16 * 9 if 'repeat' in info else serializer.addr)
     for i in range(6):
       serializer.write_word(0x3c64 + i * 2, 0xffff)
-    
+
     for i, info in enumerate(music_info['instruments']):
       ea = 0x3d00 + i * 6
       serializer.memory[ea + 0] = info['sample']
@@ -386,7 +388,7 @@ def serialize_song(serializer, song, sorted_ents):
 def compare_with_orig(serializer, song):
   ranges=[]
   ok = True
-  spc = open('sound/%s.spc' % song, 'rb').read()
+  spc = open(EXTRACT_PATH+'sound/%s.spc' % song, 'rb').read()
   for i in range(65536):
     if serializer.memory[i] != None:
       if serializer.memory[i]!= spc[i]:
@@ -430,9 +432,9 @@ def print_song(song, f):
 
   serializer = Serializer()
 
-  sorted_ents = process_file(open('sound_%s.txt' % song, 'r'))
+  sorted_ents = process_file(open(EXTRACT_PATH+'sound_%s.txt' % song, 'r'))
   if song == 'intro':
-    sorted_ents.extend(process_file(open('sfx.txt' , 'r')))
+    sorted_ents.extend(process_file(open(EXTRACT_PATH+'sfx.txt' , 'r')))
 
   serialize_song(serializer, song, sorted(sorted_ents, key = lambda x: x.ea))
 

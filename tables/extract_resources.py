@@ -7,8 +7,15 @@ import tables
 import yaml
 import extract_music
 import os
+import shutil
 
 PATH=''
+EXTRACT_PATH='extracted/'
+
+if os.path.exists(EXTRACT_PATH):
+  shutil.rmtree(EXTRACT_PATH)
+
+os.makedirs(EXTRACT_PATH)
 
 ROM = util.LoadedRom(sys.argv[1] if len(sys.argv) >= 2 else None)
 
@@ -245,19 +252,19 @@ def print_overworld_area(overworld_area):
       'info' : get_info(2),
       'sprites' : decode_sprites(0x89CA21)
     }
-    
+
   s = yaml.dump(y, default_flow_style=None, sort_keys=False)
-  open(PATH+'overworld/overworld-%d.yaml' % overworld_area, 'w').write(s)
+  open(EXTRACT_PATH+'overworld/overworld-%04d.yaml' % overworld_area, 'w').write(s)
 
 def print_all_overworld_areas():
   area_heads = ROM.get_bytes(0x82A5EC, 64)
-  
+
   for i in range(160):
     if i >= 128 or area_heads[i&63] == (i&63):
       print_overworld_area(i)
 
 def print_dialogue():
-  text_compression.print_strings(open('dialogue.txt', 'w'), get_byte)
+  text_compression.print_strings(open(EXTRACT_PATH+'dialogue.txt', 'w'), get_byte)
 
 def decomp_one_spr_2bit(data, offs, target, toffs, pitch):
   for y in range(8):
@@ -305,7 +312,7 @@ def convert_snes_palette(v):
 
 def decode_link_sprites():
   kLinkPalette = [0, 0x7fff, 0x237e, 0x11b7, 0x369e, 0x14a5,  0x1ff, 0x1078, 0x599d, 0x3647, 0x3b68,  0xa4a, 0x12ef, 0x2a5c, 0x1571, 0x7a18]
-  decomp_save(get_bytes(0x108000, 32768), PATH+'linksprite.png',
+  decomp_save(get_bytes(0x108000, 32768), EXTRACT_PATH+'linksprite.png',
               decomp_one_spr_4bit, 32, 448, convert_snes_palette(kLinkPalette))
 
 def decomp_save_2bit(data, fname):
@@ -621,7 +628,7 @@ def print_room(room_index):
 def print_all_dungeon_rooms():
   for i in range(320):
     s = print_room(i)
-    open(PATH + 'dungeon/dungeon-%d.yaml' % i, 'w').write(s)
+    open(EXTRACT_PATH + 'dungeon/dungeon-%04d.yaml' % i, 'w').write(s)
 
 def print_default_rooms():
   def print_default_room(idx):
@@ -634,7 +641,7 @@ def print_default_rooms():
   for i in range(8):
     default_rooms['Default%d' % i] = print_default_room(i)
   s = yaml.dump(default_rooms, default_flow_style=None, sort_keys=False)
-  open(PATH + 'dungeon/default_rooms.yaml', 'w').write(s)
+  open(EXTRACT_PATH + 'dungeon/default_rooms.yaml', 'w').write(s)
 
 def print_overlay_rooms():
   def print_overlay_room(idx):
@@ -647,20 +654,20 @@ def print_overlay_rooms():
   for i in range(19):
     default_rooms['Overlay%d' % i] = print_overlay_room(i)
   s = yaml.dump(default_rooms, default_flow_style=None, sort_keys=False)
-  open(PATH + 'dungeon/overlay_rooms.yaml', 'w').write(s)
+  open(EXTRACT_PATH + 'dungeon/overlay_rooms.yaml', 'w').write(s)
 
 def print_all():
-  os.makedirs('img', exist_ok=True)
-  os.makedirs('overworld', exist_ok=True)
-  os.makedirs('dungeon', exist_ok=True)
-  os.makedirs('sound', exist_ok=True)
+  os.makedirs(EXTRACT_PATH+'img', exist_ok=True)
+  os.makedirs(EXTRACT_PATH+'overworld', exist_ok=True)
+  os.makedirs(EXTRACT_PATH+'dungeon', exist_ok=True)
+  os.makedirs(EXTRACT_PATH+'sound', exist_ok=True)
   print_all_overworld_areas()
   decode_link_sprites()
   print_all_dungeon_rooms()
   print_overlay_rooms()
   print_default_rooms()
   print_dialogue()
-  print_map32_to_map16(open(PATH+'map32_to_map16.txt', 'w'))
+  print_map32_to_map16(open(EXTRACT_PATH+'map32_to_map16.txt', 'w'))
   extract_music.extract_sound_data(ROM)
 
 

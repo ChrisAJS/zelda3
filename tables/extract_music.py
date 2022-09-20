@@ -5,6 +5,7 @@ import yaml
 import time
 import util
 
+EXTRACT_PATH='extracted/'
 
 def load_sound_bank(rom, ea, mem_in = None):
   memory = list(mem_in) if mem_in else [None]*65536
@@ -297,8 +298,8 @@ def dump_brr_audio():
     return r, [get_byte(start+x) for x in range(len(r)//16 * 9)], get_byte(start)&0x2 != 0
   for audio_idx in range(25):
     sound_data, brr_data, brr_repeat = decode_brr(audio_idx)
-    open('sound/sound%d.pcm.brr' % audio_idx, 'wb').write(bytes(brr_data))
-    open('sound/sound%d.pcm' % audio_idx, 'wb').write(sound_data)
+    open(EXTRACT_PATH+'sound/sound%d.pcm.brr' % audio_idx, 'wb').write(bytes(brr_data))
+    open(EXTRACT_PATH+'sound/sound%d.pcm' % audio_idx, 'wb').write(sound_data)
 
 def dump_music_info():
   music_info = {}
@@ -307,7 +308,7 @@ def dump_music_info():
   for audio_idx in range(25):
     start, rep = get_word(0x3c00 + audio_idx * 4), get_word(0x3c00 + audio_idx * 4 + 2)
     sample_info = {
-      'file' : 'sound/sound%d.pcm' % kDupSamples.get(audio_idx, audio_idx)
+      'file' : EXTRACT_PATH+'sound/sound%d.pcm' % kDupSamples.get(audio_idx, audio_idx)
     }
     if get_byte(start) & 2:
       sample_info['repeat'] = (rep - start) // 9 * 16
@@ -350,7 +351,7 @@ def dump_music_info():
     music_info['sfx_instruments'].append(info)  
 
   s = yaml.dump(music_info, default_flow_style=None, sort_keys=False)
-  open('music_info.yaml', 'w').write(s)
+  open(EXTRACT_PATH+'music_info.yaml', 'w').write(s)
 
 def decode_sfx(ea, next_addr):
   r = []
@@ -451,12 +452,12 @@ def print_all_sfx(f):
 def extract_sound_data(rom):
   for song in ['intro', 'indoor', 'ending']:
     load_song(rom, song)
-    open('sound/%s.spc' % song, 'wb').write(bytes((0 if a == None else a) for a in memory))
-    print_song(song, open('sound_%s.txt' % song, 'w'))
+    open(EXTRACT_PATH+'sound/%s.spc' % song, 'wb').write(bytes((0 if a == None else a) for a in memory))
+    print_song(song, open(EXTRACT_PATH+'sound_%s.txt' % song, 'w'))
     if song == 'intro':
       dump_brr_audio()
       dump_music_info()
-      print_all_sfx(open('sfx.txt', 'w'))
+      print_all_sfx(open(EXTRACT_PATH+'sfx.txt', 'w'))
 
 if __name__ == "__main__":
   if len(sys.argv) < 3:

@@ -11,7 +11,7 @@
 typedef struct Ppu Ppu;
 
 #include "snes.h"
-#include "../types.h"
+#include "types.h"
 
 typedef struct BgLayer {
   uint16_t hScroll;

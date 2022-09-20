@@ -7,10 +7,7 @@
 *.aps
 /obj/
 /bin/
-/tables/overworld/*.yaml
-/tables/dungeon/*.yaml
-/tables/img/
-/tables/old/
+/tables/extracted/
 /tables/zelda3.sfc
 /tables/zelda3.smc
 /saves/*.sav
@@ -24,3 +21,5 @@ __pycache__
 /snes/*.o
 /msu/alttp_msu-*.pcm
 /tmp/
+build/
+/zelda/gen/*.h

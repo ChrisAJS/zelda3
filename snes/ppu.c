@@ -7,7 +7,6 @@
 #include <assert.h>
 #include "ppu.h"
 #include "snes.h"
-#include "../types.h"
 
 static const uint8 kSpriteSizes[8][2] = {
   {8, 16}, {8, 32}, {8, 64}, {16, 32},
